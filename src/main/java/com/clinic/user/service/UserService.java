@@ -4,6 +4,7 @@ import com.clinic.exception.EmailAlreadyExistsException;
 import com.clinic.user.dto.UserRequestDTO;
 import com.clinic.user.dto.UserResponseDTO;
 import com.clinic.user.model.User;
+import com.clinic.user.model.UserRole;
 import com.clinic.user.repository.UserRespository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ public class UserService {
     private final UserRespository userRespository;
     private final PasswordEncoder passwordEncoder;
 
+    /*
     public UserResponseDTO create(UserRequestDTO dto) {
         if (userRespository.existsByEmail(dto.getEmail())) {
             throw new EmailAlreadyExistsException("Email já existe.");
@@ -35,7 +37,27 @@ public class UserService {
         User savedUser = userRespository.save(user);
         return toResponseDTO(savedUser);
     }
+*/
+    public User createPatientUser(String name, String email, String rawPassword) {
+        validateEmail(email);
+        User user = User.builder()
+                .name(name)
+                .email(email)
+                .password(passwordEncoder.encode(rawPassword))
+                .role(UserRole.PATIENT)
+                .active(true)
+                .createdAt(LocalDateTime.now())
+                .build();
+        return userRespository.save(user);
+    }
 
+    private void validateEmail(String email) {
+        if (userRespository.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException("Email já existe.");
+        }
+    }
+
+    /*
     private UserResponseDTO toResponseDTO(User user) {
         return UserResponseDTO.builder()
                 .id(user.getId())
@@ -46,5 +68,6 @@ public class UserService {
                 .createdAt(user.getCreatedAt())
                 .build();
     }
+    */
 
 }
