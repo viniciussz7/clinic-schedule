@@ -42,7 +42,7 @@ doctor/
 appointment/
 schedule/
 auth/
-config/
+config/security
 exception/
 ```
 
@@ -83,13 +83,49 @@ Endpoint:
 ```http
 POST /patients/register
 ```
+### 🔐 Autenticação
+
+* Login por e-mail e senha
+* Validação de credenciais
+* Geração de token JWT
+* Token com:
+  * userId
+  * email
+  * role
+  * expiração
+* Filtro JWT global
+* Rotas protegidas com Spring Security
+
+Endpoints:
+
+```http
+POST /auth/login
+GET /auth/me
+```
+
+---
+
+### 👤 Endpoint /auth/me
+
+Retorna dados do usuário autenticado através do token JWT.
+
+Exemplo:
+
+```json
+{
+"id": "...",
+"name": "Vinicius Souza",
+"email": "vinicius@email.com",
+"role": "PATIENT",
+"active": true
+}
+```
 
 ---
 
 ## 📌 Próximas Implementações
 
-* Login com JWT
-* Rotas protegidas por perfil
+* Autorização por perfil (ADMIN / DOCTOR / PATIENT)
 * Cadastro de médicos
 * Agenda médica
 * Slots disponíveis
