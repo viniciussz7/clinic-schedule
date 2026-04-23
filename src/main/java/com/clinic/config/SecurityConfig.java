@@ -30,7 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**",
                                 "/auth/login",
                                 "/patients/register",
-                                "/specialties").permitAll()
+                                "/specialties",
+                                "/doctors").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/patient/**").hasRole("PATIENT")

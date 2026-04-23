@@ -14,4 +14,6 @@ public class DoctorController {
     public String dashboard() {
         return "Welcome to the Doctor dashboard!";
     }
+
+
 }
