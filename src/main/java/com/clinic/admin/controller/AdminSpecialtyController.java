@@ -1,8 +1,7 @@
-package com.clinic.specialty.controller;
+package com.clinic.admin.controller;
 
 import com.clinic.specialty.dto.CreateSpecialtyRequestDTO;
 import com.clinic.specialty.dto.SpecialtyResponseDTO;
-import com.clinic.specialty.model.Specialty;
 import com.clinic.specialty.service.SpecialtyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

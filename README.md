@@ -123,10 +123,56 @@ Exemplo:
 
 ---
 
+### ADMIN
+
+Ao subir a aplicação, um administrador padrão é criado automaticamente (se não existir).
+```text
+email: admin@clinic.com
+password: admin123
+role: ADMIN
+```
+
+---
+
+### Médicos
+
+* Cadastro de médicos realizado por ADMIN.
+* Validação de CRM único
+* Associação de médicos a especialidades
+
+Endpoints:
+
+```http
+POST /admin/doctors
+GET /doctors
+GET /doctor/dashboard
+```
+---
+
+### Espacialidades
+
+* Cadastro de especialidades médicas realizado por ADMIN.
+* Validação de nome único
+
+Endpoints:
+
+```http
+POST /admin/specialties
+GET /specialties
+```
+
+---
+
+### 👥 Controle de Acesso por Perfil (RBAC)
+
+* ADMIN: Acesso total a todos os endpoints
+* DOCTOR: Acesso a endpoints relacionados a médicos (exceto criação, feito exclusivamente pelo admin) e consultas
+* PATIENT: Acesso a endpoints relacionados a pacientes e agendamento
+
+---
+
 ## 📌 Próximas Implementações
 
-* Autorização por perfil (ADMIN / DOCTOR / PATIENT)
-* Cadastro de médicos
 * Agenda médica
 * Slots disponíveis
 * Agendamento de consultas
