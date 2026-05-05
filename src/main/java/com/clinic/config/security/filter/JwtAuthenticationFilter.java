@@ -1,6 +1,8 @@
 package com.clinic.config.security.filter;
 
 import com.clinic.config.security.jwt.JwtService;
+import com.clinic.user.model.User;
+import com.clinic.user.repository.UserRespository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,12 +16,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UserRespository userRespository;
 
 
     @Override
@@ -33,11 +37,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (jwtService.isTokenValid(token)) {
             String userId = jwtService.extractUserId(token);
-            String role = jwtService.extractRole(token);
 
-            var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+            User user = userRespository.findById(UUID.fromString(userId))
+                    .orElseThrow(() -> new RuntimeException("User not found."));
 
-            var authentication = new UsernamePasswordAuthenticationToken(userId, null, authorities);
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
