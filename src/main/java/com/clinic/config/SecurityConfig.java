@@ -4,6 +4,7 @@ import com.clinic.config.security.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,6 +36,9 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/patient/**").hasRole("PATIENT")
+                        .requestMatchers("/appointments/me").hasRole("PATIENT")
+                        .requestMatchers(HttpMethod.POST,"/appointments/**").hasRole("PATIENT")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
