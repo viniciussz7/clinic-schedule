@@ -171,11 +171,11 @@ GET /specialties
 
 ---
 
-## Agendamento de Consultas
+### Agendamento de Consultas
 
 O módulo de consultas permite o gerenciamento completo do fluxo de agendamentos entre pacientes e médicos.
 
-### Funcionalidades implementadas
+#### Funcionalidades implementadas
 
 - Agendamento de consultas por pacientes autenticados
 - Associação automática do paciente autenticado à consulta
@@ -187,7 +187,7 @@ O módulo de consultas permite o gerenciamento completo do fluxo de agendamentos
 - Validação de propriedade da consulta
 - Proteção de endpoints baseada em roles
 
-### Status disponíveis
+#### Status disponíveis
 
 - SCHEDULED
 - CONFIRMED
@@ -195,7 +195,7 @@ O módulo de consultas permite o gerenciamento completo do fluxo de agendamentos
 - CANCELLED
 - NO_SHOW
 
-### Regras de negócio
+#### Regras de negócio
 
 - Pacientes só podem cancelar suas próprias consultas
 - Médicos só podem atualizar consultas vinculadas a eles
@@ -212,6 +212,8 @@ GET /doctor/appointments
 PATCH /doctor/appointments/{id}/status
 PATCH /appointments/{id}/cancel
 ```
+
+---
 
 ## 📌 Próximas Implementações
 
