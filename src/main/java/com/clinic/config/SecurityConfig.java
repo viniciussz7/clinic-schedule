@@ -35,10 +35,10 @@ public class SecurityConfig {
                                 "/doctors").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/doctor/**").hasRole("DOCTOR")
+                        .requestMatchers("/doctor/schedules/**").hasRole("DOCTOR")
                         .requestMatchers("/patient/**").hasRole("PATIENT")
                         .requestMatchers("/appointments/me").hasRole("PATIENT")
                         .requestMatchers(HttpMethod.POST,"/appointments/**").hasRole("PATIENT")
-
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
