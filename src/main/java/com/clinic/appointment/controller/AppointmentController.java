@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/appointments")
@@ -34,5 +35,10 @@ public class AppointmentController {
     @GetMapping("/me")
     public ResponseEntity<List<AppointmentPatientResponseDTO>> listMy(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(appointmentService.listMy(user));
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<AppointmentPatientResponseDTO> cancel(@PathVariable UUID id, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(appointmentService.cancelAppointment(id, user));
     }
 }

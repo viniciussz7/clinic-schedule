@@ -9,6 +9,7 @@ import com.clinic.appointment.model.AppointmentStatus;
 import com.clinic.appointment.repository.AppointmentRepository;
 import com.clinic.doctor.model.Doctor;
 import com.clinic.doctor.repository.DoctorRepository;
+import com.clinic.exception.AppointmentNotFoundException;
 import com.clinic.exception.DoctorNotFoundException;
 import com.clinic.exception.PacientNotFoundException;
 import com.clinic.patient.model.Patient;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -93,6 +95,99 @@ public class AppointmentService {
                 .stream()
                 .map(appointment -> toDoctorResponse(appointment, now))
                 .toList();
+    }
+
+    @Transactional
+    public AppointmentDoctorResponseDTO updateStatus(
+            UUID appointmentId,
+            AppointmentStatus newStatus,
+            User authenticatedUser
+    ){
+
+        Doctor doctor = doctorRepository.findByUserId(authenticatedUser.getId())
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor not found!"));
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found!"));
+
+        //medico dono da consulta?
+        if (!appointment.getDoctor().getId().equals(doctor.getId())) {
+            throw new RuntimeException("You cannot update this appointment.");
+        }
+
+        validateStatusTransition(appointment.getStatus(), newStatus);
+
+        appointment.setStatus(newStatus);
+        appointmentRepository.save(appointment);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return toDoctorResponse(appointment, now);
+    }
+
+    @Transactional
+    public AppointmentPatientResponseDTO cancelAppointment(UUID appointmentId, User authenticatedUser) {
+
+        Patient patient = patientRepository.findByUserId(authenticatedUser.getId())
+                .orElseThrow(() -> new PacientNotFoundException("Patient not found!"));
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new AppointmentNotFoundException("Appointment not found!"));
+
+        //validar paciente
+        if (!appointment.getPatient().getId().equals(patient.getId())) {
+            throw new RuntimeException("You cannot cancel this appointment");
+        }
+
+        //validar consulta futura
+        if (appointment.getAppointmentAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Past appointments cannot be cancelled");
+        }
+
+        //validar estado
+        if (appointment.getStatus() != AppointmentStatus.SCHEDULED && appointment.getStatus() != AppointmentStatus.CONFIRMED) {
+            throw new RuntimeException("This appointment cannot be cancelled");
+        }
+
+        appointment.setStatus(AppointmentStatus.CANCELLED);
+
+        appointmentRepository.save(appointment);
+
+        return toPatientResponse(appointment, LocalDateTime.now());
+    }
+
+    private void validateStatusTransition(AppointmentStatus current, AppointmentStatus next) {
+
+        //estados finais
+        if (current == AppointmentStatus.COMPLETED ||
+            current == AppointmentStatus.CANCELLED ||
+            current == AppointmentStatus.NO_SHOW) {
+
+            throw new RuntimeException("Cannot change a finalized appointment.");
+        }
+
+        //regras
+        switch (current) {
+            case SCHEDULED -> {
+                if (next != AppointmentStatus.CONFIRMED &&
+                        next != AppointmentStatus.CANCELLED &&
+                        next != AppointmentStatus.NO_SHOW) {
+
+                    throw new RuntimeException("Invalid transition from SCHEDULED");
+                }
+            }
+
+            case CONFIRMED -> {
+                if (next != AppointmentStatus.COMPLETED &&
+                        next != AppointmentStatus.CANCELLED &&
+                        next != AppointmentStatus.NO_SHOW) {
+
+                    throw new RuntimeException("Invalid transition from CONFIRMED");
+                }
+            }
+
+            default -> throw new RuntimeException("Invalid status transition");
+        }
     }
 
     private AppointmentResponseDTO toResponse(Appointment appointment) {

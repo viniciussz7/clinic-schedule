@@ -1,9 +1,6 @@
 package com.clinic.appointment.controller;
 
-import com.clinic.appointment.dto.AppointmentDoctorResponseDTO;
-import com.clinic.appointment.dto.AppointmentPatientResponseDTO;
-import com.clinic.appointment.dto.AppointmentResponseDTO;
-import com.clinic.appointment.dto.CreateAppointmentRequestDTO;
+import com.clinic.appointment.dto.*;
 import com.clinic.appointment.service.AppointmentService;
 import com.clinic.user.model.User;
 import jakarta.validation.Valid;
@@ -14,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/doctor/appointments")
@@ -25,5 +23,15 @@ public class DoctorAppointmentController {
     @GetMapping
     public ResponseEntity<List<AppointmentDoctorResponseDTO>> list(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(appointmentService.listDoctorAppointments(user));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<AppointmentDoctorResponseDTO> updateStatus(
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateAppointmentStatusRequestDTO request,
+            @AuthenticationPrincipal User user
+            ) {
+
+        return ResponseEntity.ok(appointmentService.updateStatus(id, request.status(), user));
     }
 }
