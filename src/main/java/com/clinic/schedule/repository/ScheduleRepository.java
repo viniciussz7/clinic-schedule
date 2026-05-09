@@ -16,4 +16,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, UUID> {
 
     boolean existsByDoctorIdAndDayOfWeekAndActiveTrueAndStartTimeLessThanAndEndTimeGreaterThan(
             UUID doctorId, ScheduleDay dayOfWeek, LocalTime start, LocalTime endTime);
+
+    boolean existsByDoctorIdAndDayOfWeekAndActiveTrueAndStartTimeLessThanEqualAndEndTimeGreaterThan(
+            UUID doctorId, ScheduleDay dayOfWeek, LocalTime appointmentTime, LocalTime appointmentTime2);
 }

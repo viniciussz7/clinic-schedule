@@ -14,12 +14,15 @@ import com.clinic.exception.DoctorNotFoundException;
 import com.clinic.exception.PacientNotFoundException;
 import com.clinic.patient.model.Patient;
 import com.clinic.patient.repository.PatientRepository;
+import com.clinic.schedule.model.ScheduleDay;
+import com.clinic.schedule.repository.ScheduleRepository;
 import com.clinic.user.model.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +33,7 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
+    private final ScheduleRepository scheduleRepository;
 
     @Transactional
     public AppointmentResponseDTO create( CreateAppointmentRequestDTO request,
@@ -44,19 +48,9 @@ public class AppointmentService {
             throw new DoctorNotFoundException("Doctor not found");
         }
 
-        if (appointmentRepository.existsByDoctorAndAppointmentAt(
-                doctor,
-                request.appointmentAt()
-        )) {
-            throw new RuntimeException("Doctor is not available at the requested time");
-        }
+        validateDoctorAvailability(doctor, request.appointmentAt());
 
-        if (appointmentRepository.existsByPatientAndAppointmentAt(
-                patient,
-                request.appointmentAt()
-        )) {
-            throw new RuntimeException("Patient already has appointment at this time");
-        }
+        validateAppointmentConflicts(doctor, patient, request.appointmentAt());
 
         Appointment appointment = Appointment.builder()
                 .patient(patient)
@@ -188,6 +182,42 @@ public class AppointmentService {
 
             default -> throw new RuntimeException("Invalid status transition");
         }
+    }
+
+    private void validateDoctorAvailability(Doctor doctor, LocalDateTime appointmentAt) {
+
+        ScheduleDay dayOfWeek = ScheduleDay.valueOf(appointmentAt.getDayOfWeek().name());
+
+        LocalTime appointmentTime = appointmentAt.toLocalTime();
+
+        boolean available = scheduleRepository.existsByDoctorIdAndDayOfWeekAndActiveTrueAndStartTimeLessThanEqualAndEndTimeGreaterThan(
+                doctor.getId(),
+                dayOfWeek,
+                appointmentTime,
+                appointmentTime
+        );
+
+        if (!available) {
+            throw new IllegalArgumentException("Doctor is not available at the requested time");
+        }
+    }
+
+    private void validateAppointmentConflicts(Doctor doctor, Patient patient, LocalDateTime appointmentAt) {
+
+        if (appointmentRepository.existsByDoctorAndAppointmentAt(
+                doctor,
+                appointmentAt
+        )) {
+            throw new RuntimeException("Doctor is not available at the requested time");
+        }
+
+        if (appointmentRepository.existsByPatientAndAppointmentAt(
+                patient,
+                appointmentAt
+        )) {
+            throw new RuntimeException("Patient already has appointment at this time");
+        }
+
     }
 
     private AppointmentResponseDTO toResponse(Appointment appointment) {
