@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/doctor/schedules")
@@ -35,5 +36,21 @@ public class ScheduleController {
         User authenticatedUser = (User) authentication.getPrincipal();
 
         return scheduleService.listMySchedules(authenticatedUser);
+    }
+
+    @PatchMapping("/{scheduleId}/deactivate")
+    public ResponseEntity<ScheduleResponseDTO> deactivate(@PathVariable UUID scheduleId, Authentication authentication) {
+
+        User authenticatedUser = (User) authentication.getPrincipal();
+
+        return ResponseEntity.ok(scheduleService.deactivate(scheduleId, authenticatedUser));
+    }
+
+    @PatchMapping("/{scheduleId}/activate")
+    public ResponseEntity<ScheduleResponseDTO> activate(@PathVariable UUID scheduleId, Authentication authentication) {
+
+        User authenticatedUser = (User) authentication.getPrincipal();
+
+        return ResponseEntity.ok(scheduleService.activate(scheduleId, authenticatedUser));
     }
 }

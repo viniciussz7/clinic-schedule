@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,45 @@ public class ScheduleService {
         return toResponse(schedule);
     }
 
+    public ScheduleResponseDTO deactivate(UUID scheduleId, User authenticatedUser) {
+
+        Doctor doctor = doctorRepository.findByUserId(authenticatedUser.getId()).
+                orElseThrow(() -> new DoctorNotFoundException("Doctor not found!"));
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found!"));
+
+        validateScheduleOwnership(schedule, doctor);
+
+        if (!schedule.getActive()) {
+            throw new IllegalArgumentException("Schedule is already inactive!");
+        }
+
+        schedule.setActive(false);
+        scheduleRepository.save(schedule);
+        return toResponse(schedule);
+    }
+
+    public ScheduleResponseDTO activate(UUID scheduleId, User authenticatedUser) {
+
+        Doctor doctor = doctorRepository.findByUserId(authenticatedUser.getId()).
+                orElseThrow(() -> new DoctorNotFoundException("Doctor not found!"));
+
+        Schedule schedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found!"));
+
+        validateScheduleOwnership(schedule, doctor);
+
+        if (schedule.getActive()) {
+            throw new IllegalArgumentException("Schedule is already active!");
+        }
+
+        schedule.setActive(true);
+        scheduleRepository.save(schedule);
+        return toResponse(schedule);
+    }
+
+
     @Transactional(readOnly = true)
     public List<ScheduleResponseDTO> listMySchedules(User authenticatedUser) {
 
@@ -66,6 +106,13 @@ public class ScheduleService {
                 schedule.getEndTime(),
                 schedule.getActive()
         );
+    }
+
+    private void validateScheduleOwnership(Schedule schedule, Doctor doctor) {
+
+        if (!schedule.getDoctor().getId().equals(doctor.getId())) {
+            throw new IllegalArgumentException("You can only manage your own schedules!");
+        }
     }
 
     private void validateTimeRange(LocalTime startTime, LocalTime endTime) {
