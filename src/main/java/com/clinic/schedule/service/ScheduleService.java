@@ -30,6 +30,8 @@ public class ScheduleService {
 
         validateTimeRange(request.startTime(), request.endTime());
 
+        validateOverlap(doctor, request);
+
         Schedule schedule = Schedule.builder()
                 .doctor(doctor)
                 .dayOfWeek(request.dayOfWeek())
@@ -70,6 +72,20 @@ public class ScheduleService {
 
         if (!startTime.isBefore(endTime)) {
             throw new IllegalArgumentException("Start time must be before end time!");
+        }
+    }
+
+    private void validateOverlap(Doctor doctor, CreateScheduleRequestDTO request) {
+
+        boolean hasConflict = scheduleRepository.existsByDoctorIdAndDayOfWeekAndActiveTrueAndStartTimeLessThanAndEndTimeGreaterThan(
+                doctor.getId(),
+                request.dayOfWeek(),
+                request.endTime(),
+                request.startTime()
+        );
+
+        if (hasConflict) {
+            throw new IllegalArgumentException("Schedule overlaps with existing availability!");
         }
     }
 
