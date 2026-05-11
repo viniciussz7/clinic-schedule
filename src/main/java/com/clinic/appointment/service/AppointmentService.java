@@ -18,6 +18,8 @@ import com.clinic.schedule.model.ScheduleDay;
 import com.clinic.schedule.repository.ScheduleRepository;
 import com.clinic.user.model.User;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +49,10 @@ public class AppointmentService {
         if (!doctor.getActive()) {
             throw new DoctorNotFoundException("Doctor not found");
         }
+
+        validateSlotTime(request.appointmentAt());
+
+        validateAppointmentDate(request.appointmentAt());
 
         validateDoctorAvailability(doctor, request.appointmentAt());
 
@@ -150,6 +156,14 @@ public class AppointmentService {
         return toPatientResponse(appointment, LocalDateTime.now());
     }
 
+    private void validateAppointmentDate(LocalDateTime appointmentAt) {
+
+        if (appointmentAt.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Appointment cannot be schedule in the past");
+        }
+
+    }
+
     private void validateStatusTransition(AppointmentStatus current, AppointmentStatus next) {
 
         //estados finais
@@ -218,6 +232,15 @@ public class AppointmentService {
             throw new RuntimeException("Patient already has appointment at this time");
         }
 
+    }
+
+    private void validateSlotTime(LocalDateTime appointmentAt) {
+
+        int minute = appointmentAt.getMinute();
+
+        if (minute != 0 && minute != 30) {
+            throw new IllegalArgumentException("Appointments must be scheduled in 30-minute intervals.");
+        }
     }
 
     private AppointmentResponseDTO toResponse(Appointment appointment) {

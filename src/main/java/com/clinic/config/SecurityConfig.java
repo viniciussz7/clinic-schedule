@@ -32,7 +32,7 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/patients/register",
                                 "/specialties",
-                                "/doctors").permitAll()
+                                "/doctors/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/doctor/schedules/**").hasRole("DOCTOR")
