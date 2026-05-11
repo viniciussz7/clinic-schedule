@@ -29,6 +29,8 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // permite iframe
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
                                 "/auth/login",
                                 "/patients/register",
                                 "/specialties",

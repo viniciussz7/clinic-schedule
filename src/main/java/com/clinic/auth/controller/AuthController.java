@@ -4,12 +4,20 @@ import com.clinic.auth.dto.LoginRequestDTO;
 import com.clinic.auth.dto.LoginResponseDTO;
 import com.clinic.auth.dto.MeResponseDTO;
 import com.clinic.auth.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(
+        name = "Authentication",
+        description = "Authentication and JWT management"
+)
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -17,6 +25,11 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "Authenticate a user and return a JWT token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successful authentication."),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials.")
+    })
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto) {
         return ResponseEntity.ok(authService.login(dto));

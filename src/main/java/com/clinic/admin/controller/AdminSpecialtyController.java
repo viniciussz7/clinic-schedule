@@ -3,6 +3,8 @@ package com.clinic.admin.controller;
 import com.clinic.specialty.dto.CreateSpecialtyRequestDTO;
 import com.clinic.specialty.dto.SpecialtyResponseDTO;
 import com.clinic.specialty.service.SpecialtyService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(
+        name = "Admin Specialties",
+        description = "Endpoints for administrators to manage medical specialties")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/admin/specialties")
 @RequiredArgsConstructor
