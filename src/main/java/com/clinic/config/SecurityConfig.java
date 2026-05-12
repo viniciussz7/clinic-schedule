@@ -25,11 +25,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // necessário pro H2
-                .headers(headers -> headers.frameOptions(frame -> frame.disable())) // permite iframe
+                //.csrf(csrf -> csrf.disable()) // necessário pro H2
+                //.headers(headers -> headers.frameOptions(frame -> frame.disable())) // permite iframe
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**",
-                                "/swagger-ui/**",
+                        .requestMatchers("/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/auth/login",
                                 "/patients/register",
