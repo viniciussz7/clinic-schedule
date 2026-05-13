@@ -1,4 +1,4 @@
-package com.clinic.config;
+/*package com.clinic.config;
 
 import com.clinic.user.model.User;
 import com.clinic.user.model.UserRole;
@@ -33,4 +33,4 @@ public class AdminInitializer implements CommandLineRunner {
         }
 
     }
-}
+}*/

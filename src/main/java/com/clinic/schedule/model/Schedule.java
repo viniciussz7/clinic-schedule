@@ -4,6 +4,7 @@ import com.clinic.doctor.model.Doctor;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public class Schedule {
     private UUID id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "doctor_id")
+    @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
     @Enumerated(EnumType.STRING)
@@ -35,5 +36,12 @@ public class Schedule {
     private LocalTime endTime;
 
     @Column(nullable = false)
-    private Boolean active;
+    private Boolean active  = true;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.active == null) {
+            this.active = true;
+        }
+    }
 }

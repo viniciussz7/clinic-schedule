@@ -25,7 +25,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //.csrf(csrf -> csrf.disable()) // necessário pro H2
+                .csrf(csrf -> csrf.disable()) // necessário para permitir POST, PUT, DELETE sem token CSRF
                 //.headers(headers -> headers.frameOptions(frame -> frame.disable())) // permite iframe
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**",
